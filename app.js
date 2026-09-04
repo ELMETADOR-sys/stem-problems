@@ -5,11 +5,14 @@ const appState = {
     problems: [],
     comments: {},
     userProgress: {},
-    isQuizMode: false
+    userScores: {},
+    isQuizMode: false,
+    currentQuiz: null,
+    quizAnswers: {}
 };
 
-// ===== Sample Problems Data =====
-const sampleProblems = [
+// ===== Sample Problems Data (Basic - expanded database imported separately) =====
+const basicProblems = [
     {
         id: 1,
         subject: 'mathematics',
@@ -20,4 +23,610 @@ const sampleProblems = [
         image: 'https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=400&h=250&fit=crop',
         solution: 'Step 1: Subtract 5 from both sides\n2x + 5 - 5 = 13 - 5\n2x = 8\n\nStep 2: Divide both sides by 2\nx = 8/2\nx = 4',
         steps: [
-            { number: 1, title: 'Identify the equation', content: '2x + 5 = 13' },\n            { number: 2, title: 'Subtract 5 from both sides', content: '2x + 5 - 5 = 13 - 5\n2x = 8' },\n            { number: 3, title: 'Divide by 2', content: 'x = 8/2\nx = 4' },\n            { number: 4, title: 'Verify', content: '2(4) + 5 = 8 + 5 = 13 ✓' }\n        ],\n        explanation: 'To solve linear equations, isolate the variable by performing the same operations on both sides.',\n        views: 1205,\n        solved: 342\n    },\n    {\n        id: 2,\n        subject: 'physics',\n        difficulty: 'medium',\n        title: 'Calculating Velocity',\n        description: 'Find velocity using distance and time',\n        problem: 'A car travels 100 meters in 5 seconds. What is its velocity?',\n        image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=250&fit=crop',\n        solution: 'Using the formula: velocity = distance / time\nvelocity = 100 m / 5 s\nvelocity = 20 m/s',\n        steps: [\n            { number: 1, title: 'Identify given values', content: 'Distance = 100 m\nTime = 5 s' },\n            { number: 2, title: 'Write the formula', content: 'velocity = distance / time' },\n            { number: 3, title: 'Substitute values', content: 'velocity = 100 / 5' },\n            { number: 4, title: 'Calculate', content: 'velocity = 20 m/s' }\n        ],\n        explanation: 'Velocity is the rate of change of position. It is a vector quantity with both magnitude and direction.',\n        views: 890,\n        solved: 267\n    },\n    {\n        id: 3,\n        subject: 'chemistry',\n        difficulty: 'medium',\n        title: 'Balancing Chemical Equations',\n        description: 'Master the art of balancing equations',\n        problem: 'Balance the equation: H2 + O2 → H2O',\n        image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=250&fit=crop',\n        solution: 'Step 1: Count atoms on each side\nLeft: 2 H, 2 O | Right: 2 H, 1 O\n\nStep 2: Add coefficient to balance oxygen\n2H2 + O2 → 2H2O\n\nVerify: Left: 4 H, 2 O | Right: 4 H, 2 O ✓',\n        steps: [\n            { number: 1, title: 'Count atoms', content: 'Left: H=2, O=2\nRight: H=2, O=1' },\n            { number: 2, title: 'Balance oxygen', content: 'Add coefficient 2 to H2O\n2H2 + O2 → 2H2O' },\n            { number: 3, title: 'Recount', content: 'Left: H=4, O=2\nRight: H=4, O=2' },\n            { number: 4, title: 'Check', content: 'Balanced! ✓' }\n        ],\n        explanation: 'In a balanced equation, the number of each type of atom must be the same on both sides.',\n        views: 756,\n        solved: 198\n    },\n    {\n        id: 4,\n        subject: 'biology',\n        difficulty: 'easy',\n        title: 'Cell Organelles',\n        description: 'Understand the function of mitochondria',\n        problem: 'What is the function of mitochondria?',\n        image: 'https://images.unsplash.com/photo-1530587191325-3db8b1c12e3d?w=400&h=250&fit=crop',\n        solution: 'Mitochondria are known as the \"powerhouse of the cell\" because they produce energy in the form of ATP (Adenosine Triphosphate) through cellular respiration.',\n        steps: [\n            { number: 1, title: 'Definition', content: 'Mitochondria: the powerhouse of the cell' },\n            { number: 2, title: 'Function', content: 'Produces ATP through cellular respiration' },\n            { number: 3, title: 'Process', content: 'Breaks down glucose into usable energy' },\n            { number: 4, title: 'Importance', content: 'Provides energy for all cell activities' }\n        ],\n        explanation: 'ATP is created through the breakdown of glucose and other nutrients in the presence of oxygen.',\n        views: 1512,\n        solved: 524\n    },\n    {\n        id: 5,\n        subject: 'science',\n        difficulty: 'easy',\n        title: 'States of Matter',\n        description: 'Three states of matter explained',\n        problem: 'What are the three states of matter?',\n        image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=400&h=250&fit=crop',\n        solution: 'The three states of matter are:\n1. Solid - has definite shape and volume\n2. Liquid - has definite volume but takes the shape of its container\n3. Gas - has no definite shape or volume',\n        steps: [\n            { number: 1, title: 'Solid State', content: 'Definite shape and volume\nParticles tightly packed' },\n            { number: 2, title: 'Liquid State', content: 'No definite shape\nDefinite volume\nParticles loosely packed' },\n            { number: 3, title: 'Gas State', content: 'No definite shape or volume\nParticles very spread out' },\n            { number: 4, title: 'Transitions', content: 'Melting, Freezing, Boiling, Condensation' }\n        ],\n        explanation: 'The state of matter depends on temperature and pressure conditions.',\n        views: 2341,\n        solved: 891\n    },\n    {\n        id: 6,\n        subject: 'mathematics',\n        difficulty: 'hard',\n        title: 'Quadratic Formula',\n        description: 'Solve quadratic equations using the formula',\n        problem: 'Solve: x² - 5x + 6 = 0 using the quadratic formula',\n        image: 'https://images.unsplash.com/photo-1505228395891-9a51e7e86e81?w=400&h=250&fit=crop',\n        solution: 'Using the quadratic formula: x = (-b ± √(b²-4ac)) / 2a\na=1, b=-5, c=6\nx = (5 ± √(25-24)) / 2\nx = (5 ± 1) / 2\nx = 3 or x = 2',\n        steps: [\n            { number: 1, title: 'Identify a, b, c', content: 'a=1, b=-5, c=6' },\n            { number: 2, title: 'Apply formula', content: 'x = (-b ± √(b²-4ac)) / 2a' },\n            { number: 3, title: 'Calculate discriminant', content: 'b²-4ac = 25-24 = 1' },\n            { number: 4, title: 'Find solutions', content: 'x = (5+1)/2 = 3 or x = (5-1)/2 = 2' }\n        ],\n        explanation: 'The quadratic formula works for all quadratic equations.',\n        views: 645,\n        solved: 187\n    }\n];\n\n// ===== Initialize App =====\nfunction initializeApp() {\n    loadFromLocalStorage();\n    setupEventListeners();\n    updateStats();\n    \n    if (!appState.currentUser) {\n        document.getElementById('heroSection').style.display = 'flex';\n        document.querySelector('.main-container').style.display = 'none';\n        showLoginModal();\n    } else {\n        updateUserDisplay();\n        loadProblems();\n    }\n}\n\n// ===== Local Storage =====\nfunction saveToLocalStorage() {\n    localStorage.setItem('appState', JSON.stringify(appState));\n}\n\nfunction loadFromLocalStorage() {\n    const saved = localStorage.getItem('appState');\n    if (saved) {\n        const loaded = JSON.parse(saved);\n        appState.currentUser = loaded.currentUser;\n        appState.users = loaded.users;\n        appState.comments = loaded.comments;\n        appState.userProgress = loaded.userProgress;\n    }\n    appState.problems = sampleProblems;\n}\n\n// ===== Event Listeners =====\nfunction setupEventListeners() {\n    // Login/Logout\n    document.getElementById('loginBtn').addEventListener('click', showLoginModal);\n    document.getElementById('logoutBtn').addEventListener('click', logout);\n    document.getElementById('loginForm').addEventListener('submit', handleLogin);\n    document.getElementById('signupForm').addEventListener('submit', handleSignup);\n    \n    // Modal\n    document.querySelectorAll('.close').forEach(btn => {\n        btn.addEventListener('click', closeAllModals);\n    });\n    document.querySelectorAll('.modal').forEach(modal => {\n        modal.addEventListener('click', (e) => {\n            if (e.target === modal) closeAllModals();\n        });\n    });\n    \n    // Toggle signup/login\n    document.querySelectorAll('.toggle-signup').forEach(el => {\n        el.addEventListener('click', () => toggleAuthForms());\n    });\n    document.querySelectorAll('.toggle-login').forEach(el => {\n        el.addEventListener('click', () => toggleAuthForms());\n    });\n    \n    // Filters\n    document.querySelectorAll('.filter-checkbox').forEach(checkbox => {\n        checkbox.addEventListener('change', loadProblems);\n    });\n    document.getElementById('sortBy').addEventListener('change', loadProblems);\n    document.getElementById('clearFilters').addEventListener('click', clearAllFilters);\n    \n    // Search\n    document.getElementById('searchBar').addEventListener('input', () => {\n        debounceSearch();\n    });\n    document.querySelector('.search-btn').addEventListener('click', loadProblems);\n    \n    // Toggle view\n    document.getElementById('toggleView').addEventListener('click', toggleViewMode);\n}\n\n// ===== Authentication =====\nfunction showLoginModal() {\n    document.getElementById('loginModal').classList.add('active');\n}\n\nfunction closeAllModals() {\n    document.querySelectorAll('.modal').forEach(modal => {\n        modal.classList.remove('active');\n    });\n}\n\nfunction toggleAuthForms() {\n    document.getElementById('loginForm').style.display = \n        document.getElementById('loginForm').style.display === 'none' ? 'flex' : 'none';\n    document.getElementById('signupForm').style.display = \n        document.getElementById('signupForm').style.display === 'flex' ? 'none' : 'flex';\n}\n\nfunction handleLogin(e) {\n    e.preventDefault();\n    const username = document.getElementById('username').value;\n    const password = document.getElementById('password').value;\n    \n    if (appState.users[username] && appState.users[username].password === password) {\n        appState.currentUser = {\n            username: username,\n            email: appState.users[username].email,\n            points: appState.users[username].points || 0\n        };\n        saveToLocalStorage();\n        closeAllModals();\n        updateUserDisplay();\n        document.getElementById('heroSection').style.display = 'none';\n        document.querySelector('.main-container').style.display = 'grid';\n        loadProblems();\n    } else {\n        alert('Invalid credentials');\n    }\n}\n\nfunction handleSignup(e) {\n    e.preventDefault();\n    const username = document.getElementById('signup-username').value;\n    const email = document.getElementById('signup-email').value;\n    const password = document.getElementById('signup-password').value;\n    const confirm = document.getElementById('signup-confirm').value;\n    \n    if (password !== confirm) {\n        alert('Passwords do not match');\n        return;\n    }\n    \n    if (appState.users[username]) {\n        alert('Username already exists');\n        return;\n    }\n    \n    appState.users[username] = {\n        email: email,\n        password: password,\n        points: 0,\n        joinedDate: new Date().toISOString()\n    };\n    \n    appState.currentUser = {\n        username: username,\n        email: email,\n        points: 0\n    };\n    \n    saveToLocalStorage();\n    closeAllModals();\n    updateUserDisplay();\n    document.getElementById('heroSection').style.display = 'none';\n    document.querySelector('.main-container').style.display = 'grid';\n    loadProblems();\n}\n\nfunction logout() {\n    appState.currentUser = null;\n    saveToLocalStorage();\n    document.getElementById('userDisplay').style.display = 'none';\n    document.getElementById('loginBtn').style.display = 'block';\n    document.getElementById('heroSection').style.display = 'flex';\n    document.querySelector('.main-container').style.display = 'none';\n}\n\nfunction updateUserDisplay() {\n    if (appState.currentUser) {\n        document.getElementById('userDisplay').style.display = 'flex';\n        document.getElementById('loginBtn').style.display = 'none';\n        document.getElementById('userName').textContent = appState.currentUser.username;\n        document.getElementById('userPoints').textContent = appState.currentUser.points + ' pts';\n    }\n}\n\n// ===== Problems Loading =====\nfunction loadProblems() {\n    const container = document.getElementById('problemsContainer');\n    \n    // Get filter values\n    const selectedSubjects = Array.from(\n        document.querySelectorAll('.filter-checkbox:checked')\n    ).filter(el => ['mathematics', 'science', 'physics', 'biology', 'chemistry'].includes(el.value))\n     .map(el => el.value);\n    \n    const selectedDifficulties = Array.from(\n        document.querySelectorAll('.filter-checkbox:checked')\n    ).filter(el => ['easy', 'medium', 'hard'].includes(el.value))\n     .map(el => el.value);\n    \n    const searchTerm = document.getElementById('searchBar').value.toLowerCase();\n    const sortBy = document.getElementById('sortBy').value;\n    \n    // Filter problems\n    let filtered = appState.problems.filter(p => {\n        const matchesSubject = selectedSubjects.includes(p.subject);\n        const matchesDifficulty = selectedDifficulties.includes(p.difficulty);\n        const matchesSearch = p.title.toLowerCase().includes(searchTerm) || \n                            p.description.toLowerCase().includes(searchTerm);\n        return matchesSubject && matchesDifficulty && matchesSearch;\n    });\n    \n    // Sort\n    if (sortBy === 'popular') {\n        filtered.sort((a, b) => b.views - a.views);\n    } else if (sortBy === 'difficulty') {\n        const diffOrder = { easy: 0, medium: 1, hard: 2 };\n        filtered.sort((a, b) => diffOrder[a.difficulty] - diffOrder[b.difficulty]);\n    }\n    \n    // Display\n    container.innerHTML = filtered.map(problem => `\n        <div class=\"problem-card\" onclick=\"openProblem(${problem.id})\">\n            <div class=\"problem-card-header\">\n                <div class=\"problem-badges\">\n                    <span class=\"badge badge-subject\">${problem.subject}</span>\n                    <span class=\"badge badge-difficulty ${problem.difficulty}\">${problem.difficulty}</span>\n                </div>\n                <button class=\"icon-btn\" onclick=\"event.stopPropagation(); bookmarkProblem(${problem.id})\">⭐</button>\n            </div>\n            <h3>${problem.title}</h3>\n            <p>${problem.description}</p>\n            <img src=\"${problem.image}\" alt=\"${problem.title}\" class=\"problem-card-image\">\n            <div class=\"problem-card-footer\">\n                <div class=\"problem-stats\">\n                    <span>👁️ ${problem.views}</span>\n                    <span>✓ ${problem.solved}</span>\n                </div>\n                <div class=\"problem-card-actions\">\n                    <button class=\"icon-btn\" onclick=\"event.stopPropagation()\">→</button>\n                </div>\n            </div>\n        </div>\n    `).join('');\n}\n\n// ===== Problem Detail =====\nfunction openProblem(id) {\n    if (!appState.currentUser) {\n        alert('Please login first');\n        return;\n    }\n    \n    const problem = appState.problems.find(p => p.id === id);\n    if (!problem) return;\n    \n    // Populate modal\n    document.getElementById('problemTitle').textContent = problem.title;\n    document.getElementById('problemSubject').textContent = problem.subject;\n    document.getElementById('problemSubject').className = 'badge badge-subject';\n    document.getElementById('problemDifficulty').textContent = problem.difficulty;\n    document.getElementById('problemDifficulty').className = `badge badge-difficulty ${problem.difficulty}`;\n    document.getElementById('problemStatement').textContent = problem.problem;\n    document.getElementById('problemImage').src = problem.image;\n    document.getElementById('problemImage').style.display = 'block';\n    document.getElementById('problemSolution').textContent = problem.solution;\n    \n    // Steps\n    const stepsHTML = problem.steps.map(step => `\n        <div class=\"step\">\n            <div class=\"step-number\">${step.number}</div>\n            <div class=\"step-content\">\n                <strong>${step.title}</strong><br>\n                <span>${step.content}</span>\n            </div>\n        </div>\n    `).join('');\n    document.getElementById('stepByStep').innerHTML = stepsHTML;\n    \n    // Comments\n    loadComments(id);\n    \n    // Mark complete button\n    document.getElementById('markCompletedBtn').onclick = () => markProblemComplete(id);\n    document.getElementById('submitCommentBtn').onclick = () => submitComment(id);\n    \n    document.getElementById('problemModal').classList.add('active');\n}\n\n// ===== Comments =====\nfunction loadComments(problemId) {\n    const commentsList = document.getElementById('commentsList');\n    const comments = appState.comments[problemId] || [];\n    \n    commentsList.innerHTML = comments.map((comment, index) => `\n        <div class=\"comment\">\n            <span class=\"comment-author\">${comment.author}</span>\n            <span class=\"comment-time\">${new Date(comment.timestamp).toLocaleDateString()}</span>\n            <div class=\"comment-text\">${comment.text}</div>\n        </div>\n    `).join('');\n}\n\nfunction submitComment(problemId) {\n    const text = document.getElementById('commentText').value;\n    if (!text.trim()) return;\n    \n    if (!appState.comments[problemId]) {\n        appState.comments[problemId] = [];\n    }\n    \n    appState.comments[problemId].push({\n        author: appState.currentUser.username,\n        text: text,\n        timestamp: new Date().toISOString()\n    });\n    \n    document.getElementById('commentText').value = '';\n    saveToLocalStorage();\n    loadComments(problemId);\n}\n\n// ===== Gamification =====\nfunction markProblemComplete(problemId) {\n    const points = 10;\n    appState.currentUser.points += points;\n    appState.users[appState.currentUser.username].points = appState.currentUser.points;\n    saveToLocalStorage();\n    updateUserDisplay();\n    alert(`🎉 Problem solved! You earned ${points} points!`);\n}\n\nfunction bookmarkProblem(problemId) {\n    alert('❤️ Problem bookmarked!');\n}\n\n// ===== Filters & Search =====\nfunction clearAllFilters() {\n    document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = true);\n    document.getElementById('searchBar').value = '';\n    document.getElementById('sortBy').value = 'newest';\n    loadProblems();\n}\n\nlet searchTimeout;\nfunction debounceSearch() {\n    clearTimeout(searchTimeout);\n    searchTimeout = setTimeout(() => loadProblems(), 300);\n}\n\n// ===== View Modes =====\nfunction toggleViewMode() {\n    appState.isQuizMode = !appState.isQuizMode;\n    alert(appState.isQuizMode ? 'Quiz Mode Enabled' : 'Card View Enabled');\n}\n\n// ===== Stats =====\nfunction updateStats() {\n    document.getElementById('totalProblems').textContent = appState.problems.length;\n    document.getElementById('totalUsers').textContent = Object.keys(appState.users).length + 1;\n}\n\n// ===== Initialize =====\ndocument.addEventListener('DOMContentLoaded', initializeApp);
+            { number: 1, title: 'Identify the equation', content: '2x + 5 = 13' },
+            { number: 2, title: 'Subtract 5 from both sides', content: '2x + 5 - 5 = 13 - 5\n2x = 8' },
+            { number: 3, title: 'Divide by 2', content: 'x = 8/2\nx = 4' },
+            { number: 4, title: 'Verify', content: '2(4) + 5 = 8 + 5 = 13 ✓' }
+        ],
+        explanation: 'To solve linear equations, isolate the variable by performing the same operations on both sides.',
+        views: 1205,
+        solved: 342,
+        quizQuestion: {
+            type: 'multiple',
+            question: 'Solve for x: 2x + 5 = 13',
+            options: ['x = 3', 'x = 4', 'x = 5', 'x = 6'],
+            correct: 1,
+            points: 5
+        }
+    }
+];
+
+// ===== Initialize App =====
+function initializeApp() {
+    loadFromLocalStorage();
+    setupEventListeners();
+    
+    // Merge basic problems with expanded database
+    if (typeof expandedProblems !== 'undefined') {
+        appState.problems = expandedProblems;
+    } else {
+        appState.problems = basicProblems;
+    }
+    
+    updateStats();
+    
+    if (!appState.currentUser) {
+        document.getElementById('heroSection').style.display = 'flex';
+        document.querySelector('.main-container').style.display = 'none';
+        showLoginModal();
+    } else {
+        updateUserDisplay();
+        loadProblems();
+    }
+}
+
+// ===== Local Storage =====
+function saveToLocalStorage() {
+    const dataToSave = {
+        currentUser: appState.currentUser,
+        users: appState.users,
+        comments: appState.comments,
+        userProgress: appState.userProgress,
+        userScores: appState.userScores,
+        isQuizMode: appState.isQuizMode
+    };
+    localStorage.setItem('appState', JSON.stringify(dataToSave));
+}
+
+function loadFromLocalStorage() {
+    const saved = localStorage.getItem('appState');
+    if (saved) {
+        const loaded = JSON.parse(saved);
+        appState.currentUser = loaded.currentUser;
+        appState.users = loaded.users;
+        appState.comments = loaded.comments;
+        appState.userProgress = loaded.userProgress;
+        appState.userScores = loaded.userScores;
+        appState.isQuizMode = loaded.isQuizMode;
+    }
+}
+
+// ===== Event Listeners =====
+function setupEventListeners() {
+    // Login/Logout
+    document.getElementById('loginBtn').addEventListener('click', showLoginModal);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    document.getElementById('signupForm').addEventListener('submit', handleSignup);
+    
+    // Modal
+    document.querySelectorAll('.close').forEach(btn => {
+        btn.addEventListener('click', closeAllModals);
+    });
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeAllModals();
+        });
+    });
+    
+    // Toggle signup/login
+    document.querySelectorAll('.toggle-signup').forEach(el => {
+        el.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleAuthForms();
+        });
+    });
+    document.querySelectorAll('.toggle-login').forEach(el => {
+        el.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleAuthForms();
+        });
+    });
+    
+    // Filters
+    document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', loadProblems);
+    });
+    document.getElementById('sortBy').addEventListener('change', loadProblems);
+    document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
+    
+    // Search
+    document.getElementById('searchBar').addEventListener('input', () => {
+        debounceSearch();
+    });
+    document.querySelector('.search-btn').addEventListener('click', loadProblems);
+    
+    // Toggle view
+    document.getElementById('toggleView').addEventListener('click', toggleViewMode);
+}
+
+// ===== Authentication =====
+function showLoginModal() {
+    document.getElementById('loginModal').classList.add('active');
+}
+
+function closeAllModals() {
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.remove('active');
+    });
+}
+
+function toggleAuthForms() {
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    
+    if (loginForm.style.display === 'none') {
+        loginForm.style.display = 'flex';
+        signupForm.style.display = 'none';
+    } else {
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'flex';
+    }
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    if (appState.users[username] && appState.users[username].password === password) {
+        appState.currentUser = {
+            username: username,
+            email: appState.users[username].email,
+            points: appState.users[username].points || 0,
+            joinedDate: appState.users[username].joinedDate
+        };
+        saveToLocalStorage();
+        closeAllModals();
+        updateUserDisplay();
+        document.getElementById('heroSection').style.display = 'none';
+        document.querySelector('.main-container').style.display = 'grid';
+        loadProblems();
+    } else {
+        alert('❌ Invalid credentials. Try username: student1, password: password123');
+    }
+}
+
+function handleSignup(e) {
+    e.preventDefault();
+    const username = document.getElementById('signup-username').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const confirm = document.getElementById('signup-confirm').value;
+    
+    if (password !== confirm) {
+        alert('❌ Passwords do not match');
+        return;
+    }
+    
+    if (appState.users[username]) {
+        alert('❌ Username already exists');
+        return;
+    }
+    
+    appState.users[username] = {
+        email: email,
+        password: password,
+        points: 0,
+        joinedDate: new Date().toISOString()
+    };
+    
+    appState.currentUser = {
+        username: username,
+        email: email,
+        points: 0,
+        joinedDate: new Date().toISOString()
+    };
+    
+    saveToLocalStorage();
+    closeAllModals();
+    updateUserDisplay();
+    document.getElementById('heroSection').style.display = 'none';
+    document.querySelector('.main-container').style.display = 'grid';
+    loadProblems();
+    alert('✅ Account created successfully!');
+}
+
+function logout() {
+    appState.currentUser = null;
+    appState.isQuizMode = false;
+    saveToLocalStorage();
+    document.getElementById('userDisplay').style.display = 'none';
+    document.getElementById('loginBtn').style.display = 'block';
+    document.getElementById('heroSection').style.display = 'flex';
+    document.querySelector('.main-container').style.display = 'none';
+}
+
+function updateUserDisplay() {
+    if (appState.currentUser) {
+        document.getElementById('userDisplay').style.display = 'flex';
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('userName').textContent = appState.currentUser.username;
+        document.getElementById('userPoints').textContent = appState.currentUser.points + ' pts';
+    }
+}
+
+// ===== Problems Loading =====
+function loadProblems() {
+    if (appState.isQuizMode) {
+        loadQuizMode();
+        return;
+    }
+    
+    const container = document.getElementById('problemsContainer');
+    
+    // Get filter values
+    const selectedSubjects = Array.from(
+        document.querySelectorAll('.filter-checkbox:checked')
+    ).filter(el => ['mathematics', 'science', 'physics', 'biology', 'chemistry'].includes(el.value))
+     .map(el => el.value);
+    
+    const selectedDifficulties = Array.from(
+        document.querySelectorAll('.filter-checkbox:checked')
+    ).filter(el => ['easy', 'medium', 'hard'].includes(el.value))
+     .map(el => el.value);
+    
+    const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+    const sortBy = document.getElementById('sortBy').value;
+    
+    // Filter problems
+    let filtered = appState.problems.filter(p => {
+        const matchesSubject = selectedSubjects.length === 0 || selectedSubjects.includes(p.subject);
+        const matchesDifficulty = selectedDifficulties.length === 0 || selectedDifficulties.includes(p.difficulty);
+        const matchesSearch = p.title.toLowerCase().includes(searchTerm) || 
+                            p.description.toLowerCase().includes(searchTerm);
+        return matchesSubject && matchesDifficulty && matchesSearch;
+    });
+    
+    // Sort
+    if (sortBy === 'popular') {
+        filtered.sort((a, b) => b.views - a.views);
+    } else if (sortBy === 'difficulty') {
+        const diffOrder = { easy: 0, medium: 1, hard: 2 };
+        filtered.sort((a, b) => diffOrder[a.difficulty] - diffOrder[b.difficulty]);
+    }
+    
+    // Display
+    if (filtered.length === 0) {
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #64748b;">No problems found. Try adjusting your filters.</p>';
+        return;
+    }
+    
+    container.innerHTML = filtered.map(problem => `
+        <div class="problem-card" onclick="openProblem(${problem.id})">
+            <div class="problem-card-header">
+                <div class="problem-badges">
+                    <span class="badge badge-subject">${problem.subject}</span>
+                    <span class="badge badge-difficulty ${problem.difficulty}">${problem.difficulty}</span>
+                </div>
+                <button class="icon-btn" onclick="event.stopPropagation(); bookmarkProblem(${problem.id})" title="Bookmark">⭐</button>
+            </div>
+            <h3>${problem.title}</h3>
+            <p>${problem.description}</p>
+            <img src="${problem.image}" alt="${problem.title}" class="problem-card-image">
+            <div class="problem-card-footer">
+                <div class="problem-stats">
+                    <span>👁️ ${problem.views}</span>
+                    <span>✓ ${problem.solved}</span>
+                </div>
+                <div class="problem-card-actions">
+                    <button class="icon-btn" onclick="event.stopPropagation()" title="View">→</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===== Quiz Mode =====
+function loadQuizMode() {
+    const container = document.getElementById('problemsContainer');
+    
+    if (appState.problems.length === 0) {
+        container.innerHTML = '<p>No problems available for quiz.</p>';
+        return;
+    }
+    
+    // Shuffle problems
+    const shuffled = [...appState.problems].sort(() => Math.random() - 0.5).slice(0, 10);
+    
+    appState.currentQuiz = {
+        problems: shuffled,
+        currentIndex: 0,
+        score: 0,
+        answers: {}
+    };
+    
+    displayQuizProblem();
+}
+
+function displayQuizProblem() {
+    const container = document.getElementById('problemsContainer');
+    
+    if (!appState.currentQuiz || appState.currentQuiz.currentIndex >= appState.currentQuiz.problems.length) {
+        finishQuiz();
+        return;
+    }
+    
+    const problem = appState.currentQuiz.problems[appState.currentQuiz.currentIndex];
+    const question = problem.quizQuestion;
+    
+    const html = `
+        <div style="grid-column: 1/-1; background: white; padding: 2rem; border-radius: 12px; box-shadow: var(--shadow);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h3>Quiz Mode</h3>
+                <span style="font-weight: 600;">Question ${appState.currentQuiz.currentIndex + 1} of ${appState.currentQuiz.problems.length}</span>
+            </div>
+            
+            <div style="margin-bottom: 2rem; padding: 1.5rem; background: #f0f9ff; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">${problem.title}</h2>
+                <p style="color: #64748b; margin-bottom: 1rem;">${problem.description}</p>
+                <p style="font-size: 1.1rem; font-weight: 500;">${question.question}</p>
+            </div>
+            
+            <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+                ${question.options.map((option, index) => `
+                    <label style="display: flex; align-items: center; padding: 1rem; border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.3s ease;">
+                        <input type="radio" name="quiz-answer" value="${index}" style="width: 20px; height: 20px; cursor: pointer;">
+                        <span style="margin-left: 1rem; font-size: 1rem;">${option}</span>
+                    </label>
+                `).join('')}
+            </div>
+            
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn-primary" onclick="submitQuizAnswer()">Submit Answer</button>
+                <button class="btn-secondary" onclick="skipQuizQuestion()">Skip Question</button>
+            </div>
+            
+            <div style="margin-top: 2rem; background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                <strong>Progress:</strong>
+                <div style="width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; margin-top: 0.5rem; overflow: hidden;">
+                    <div style="width: ${(appState.currentQuiz.currentIndex / appState.currentQuiz.problems.length) * 100}%; height: 100%; background: var(--primary-color); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+function submitQuizAnswer() {
+    const selected = document.querySelector('input[name="quiz-answer"]:checked');
+    if (!selected) {
+        alert('Please select an answer');
+        return;
+    }
+    
+    const answer = parseInt(selected.value);
+    const problem = appState.currentQuiz.problems[appState.currentQuiz.currentIndex];
+    const question = problem.quizQuestion;
+    
+    appState.currentQuiz.answers[problem.id] = answer;
+    
+    if (answer === question.correct) {
+        appState.currentQuiz.score += question.points;
+        alert('✅ Correct! +' + question.points + ' points');
+    } else {
+        alert('❌ Incorrect. The correct answer is: ' + question.options[question.correct]);
+    }
+    
+    appState.currentQuiz.currentIndex++;
+    displayQuizProblem();
+}
+
+function skipQuizQuestion() {
+    appState.currentQuiz.currentIndex++;
+    displayQuizProblem();
+}
+
+function finishQuiz() {
+    const container = document.getElementById('problemsContainer');
+    const totalQuestions = appState.currentQuiz.problems.length;
+    const correctAnswers = Object.keys(appState.currentQuiz.answers).length;
+    const percentage = (appState.currentQuiz.score / (totalQuestions * 10)) * 100;
+    
+    // Save score
+    if (!appState.userScores[appState.currentUser.username]) {
+        appState.userScores[appState.currentUser.username] = [];
+    }
+    
+    appState.userScores[appState.currentUser.username].push({
+        date: new Date().toISOString(),
+        score: appState.currentQuiz.score,
+        percentage: percentage.toFixed(1)
+    });
+    
+    // Award points
+    const pointsEarned = Math.round(appState.currentQuiz.score);
+    appState.currentUser.points += pointsEarned;
+    appState.users[appState.currentUser.username].points = appState.currentUser.points;
+    
+    saveToLocalStorage();
+    updateUserDisplay();
+    
+    const html = `
+        <div style="grid-column: 1/-1; background: white; padding: 3rem; border-radius: 12px; box-shadow: var(--shadow); text-align: center;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">🎉 Quiz Complete!</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin: 2rem 0;">
+                <div style="padding: 1.5rem; background: #f0fdf4; border-radius: 8px; border: 2px solid var(--success-color);">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);">${percentage.toFixed(1)}%</div>
+                    <div style="color: #64748b; margin-top: 0.5rem;">Score</div>
+                </div>
+                <div style="padding: 1.5rem; background: #fef3c7; border-radius: 8px; border: 2px solid var(--warning-color);">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--warning-color);">${correctAnswers}/${totalQuestions}</div>
+                    <div style="color: #64748b; margin-top: 0.5rem;">Correct</div>
+                </div>
+                <div style="padding: 1.5rem; background: #dbeafe; border-radius: 8px; border: 2px solid var(--primary-color);">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--primary-color);">+${pointsEarned}</div>
+                    <div style="color: #64748b; margin-top: 0.5rem;">Points</div>
+                </div>
+            </div>
+            
+            <div style="margin: 2rem 0; padding: 1.5rem; background: #f8fafc; border-radius: 8px;">
+                <h3 style="margin-bottom: 1rem;">Performance</h3>
+                <p style="color: #64748b; margin-bottom: 0.5rem;">Great job! Keep practicing to improve your score.</p>
+                <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 6px; border-left: 4px solid var(--primary-color);">
+                    <p style="font-size: 0.9rem;"><strong>Total Points:</strong> ${appState.currentUser.points}</p>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                <button class="btn-primary" onclick="toggleViewMode()">Return to Problems</button>
+                <button class="btn-secondary" onclick="loadQuizMode()">Take Another Quiz</button>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// ===== Problem Detail =====
+function openProblem(id) {
+    if (!appState.currentUser) {
+        alert('Please login first');
+        return;
+    }
+    
+    const problem = appState.problems.find(p => p.id === id);
+    if (!problem) return;
+    
+    // Populate modal
+    document.getElementById('problemTitle').textContent = problem.title;
+    document.getElementById('problemSubject').textContent = problem.subject;
+    document.getElementById('problemSubject').className = 'badge badge-subject';
+    document.getElementById('problemDifficulty').textContent = problem.difficulty;
+    document.getElementById('problemDifficulty').className = `badge badge-difficulty ${problem.difficulty}`;
+    document.getElementById('problemStatement').textContent = problem.problem;
+    document.getElementById('problemImage').src = problem.image;
+    document.getElementById('problemImage').style.display = 'block';
+    document.getElementById('problemSolution').textContent = problem.solution;
+    
+    // Steps
+    const stepsHTML = problem.steps.map(step => `
+        <div class="step">
+            <div class="step-number">${step.number}</div>
+            <div class="step-content">
+                <strong>${step.title}</strong><br>
+                <span class="problem-text">${step.content}</span>
+            </div>
+        </div>
+    `).join('');
+    document.getElementById('stepByStep').innerHTML = stepsHTML;
+    
+    // Comments
+    loadComments(id);
+    
+    // Mark complete button
+    document.getElementById('markCompletedBtn').onclick = () => markProblemComplete(id);
+    document.getElementById('submitCommentBtn').onclick = () => submitComment(id);
+    document.getElementById('bookmarkBtn').onclick = () => bookmarkProblem(id);
+    
+    document.getElementById('problemModal').classList.add('active');
+}
+
+// ===== Comments =====
+function loadComments(problemId) {
+    const commentsList = document.getElementById('commentsList');
+    const comments = appState.comments[problemId] || [];
+    
+    if (comments.length === 0) {
+        commentsList.innerHTML = '<p style="color: #64748b; text-align: center; padding: 1rem;">No comments yet. Be the first to comment!</p>';
+        return;
+    }
+    
+    commentsList.innerHTML = comments.map((comment, index) => `
+        <div class="comment">
+            <span class="comment-author">👤 ${comment.author}</span>
+            <span class="comment-time">${new Date(comment.timestamp).toLocaleDateString()}</span>
+            <div class="comment-text">${comment.text}</div>
+        </div>
+    `).join('');
+}
+
+function submitComment(problemId) {
+    const text = document.getElementById('commentText').value;
+    if (!text.trim()) {
+        alert('Please write a comment');
+        return;
+    }
+    
+    if (!appState.comments[problemId]) {
+        appState.comments[problemId] = [];
+    }
+    
+    appState.comments[problemId].push({
+        author: appState.currentUser.username,
+        text: text,
+        timestamp: new Date().toISOString()
+    });
+    
+    document.getElementById('commentText').value = '';
+    saveToLocalStorage();
+    loadComments(problemId);
+    alert('✅ Comment posted!');
+}
+
+// ===== Gamification =====
+function markProblemComplete(problemId) {
+    const points = 10;
+    appState.currentUser.points += points;
+    appState.users[appState.currentUser.username].points = appState.currentUser.points;
+    
+    if (!appState.userProgress[appState.currentUser.username]) {
+        appState.userProgress[appState.currentUser.username] = [];
+    }
+    appState.userProgress[appState.currentUser.username].push({
+        problemId: problemId,
+        completedDate: new Date().toISOString()
+    });
+    
+    saveToLocalStorage();
+    updateUserDisplay();
+    alert(`🎉 Problem solved! You earned ${points} points!\n\nTotal Points: ${appState.currentUser.points}`);
+}
+
+function bookmarkProblem(problemId) {
+    alert('❤️ Problem bookmarked! (Feature coming soon)');
+}
+
+// ===== Filters & Search =====
+function clearAllFilters() {
+    document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = true);
+    document.getElementById('searchBar').value = '';
+    document.getElementById('sortBy').value = 'newest';
+    loadProblems();
+    alert('✅ Filters cleared');
+}
+
+let searchTimeout;
+function debounceSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => loadProblems(), 300);
+}
+
+// ===== View Modes =====
+function toggleViewMode() {
+    appState.isQuizMode = !appState.isQuizMode;
+    saveToLocalStorage();
+    
+    const button = document.getElementById('toggleView');
+    if (appState.isQuizMode) {
+        button.innerHTML = '📚 Card View';
+        button.style.background = '#10b981';
+    } else {
+        button.innerHTML = '📊 Quiz Mode';
+        button.style.background = '';
+    }
+    
+    loadProblems();
+}
+
+// ===== Stats =====
+function updateStats() {
+    const totalUsers = Object.keys(appState.users).length;
+    document.getElementById('totalProblems').textContent = appState.problems.length;
+    document.getElementById('totalUsers').textContent = totalUsers > 0 ? totalUsers : '1';
+}
+
+// ===== Initialize =====
+document.addEventListener('DOMContentLoaded', initializeApp);
