@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEM Problem Solver - Master Science & Math</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🧪</span>
+                <span>STEM Solver</span>
+            </div>
+            <div class="nav-center">
+                <input type="text" id="searchBar" class="search-input" placeholder="Search problems...">
+                <button class="search-btn">🔍</button>
+            </div>
+            <div class="nav-right">
+                <div id="userDisplay" class="user-display" style="display: none;">
+                    <span id="userName" class="user-name"></span>
+                    <span id="userPoints" class="user-points">0 pts</span>
+                    <button id="logoutBtn" class="btn-logout">Logout</button>
+                </div>
+                <button id="loginBtn" class="btn-login">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Login to STEM Solver</h2>
+            <form id="loginForm">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit" class="btn-primary">Login</button>
+                <p class="toggle-signup">Don't have an account? <a href="#signup">Sign Up</a></p>
+            </form>
+            <form id="signupForm" style="display: none;">
+                <input type="text" id="signup-username" placeholder="Choose Username" required>
+                <input type="email" id="signup-email" placeholder="Email" required>
+                <input type="password" id="signup-password" placeholder="Password" required>
+                <input type="password" id="signup-confirm" placeholder="Confirm Password" required>
+                <button type="submit" class="btn-primary">Sign Up</button>
+                <p class="toggle-login">Already have an account? <a href="#login">Login</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="heroSection" style="display: none;">
+        <div class="hero-content">
+            <h1>Master STEM Problems</h1>
+            <p>Learn Mathematics, Science, Physics, Biology & Chemistry with step-by-step solutions</p>
+            <button class="btn-primary btn-large" onclick="document.getElementById('problemsSection').scrollIntoView({behavior: 'smooth'})">
+                Start Learning
+            </button>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <h3 id="totalProblems">0</h3>
+                <p>Problems</p>
+            </div>
+            <div class="stat">
+                <h3 id="totalUsers">1</h3>
+                <p>Learners</p>
+            </div>
+            <div class="stat">
+                <h3>5</h3>
+                <p>Subjects</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Filters Section -->
+        <aside class="sidebar">
+            <h3>Filters</h3>
+            
+            <div class="filter-group">
+                <label>Subject</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" class="filter-checkbox" value="mathematics" checked> Mathematics</label>
+                    <label><input type="checkbox" class="filter-checkbox" value="science" checked> Science</label>
+                    <label><input type="checkbox" class="filter-checkbox" value="physics" checked> Physics</label>
+                    <label><input type="checkbox" class="filter-checkbox" value="biology" checked> Biology</label>
+                    <label><input type="checkbox" class="filter-checkbox" value="chemistry" checked> Chemistry</label>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Difficulty</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" class="filter-checkbox" value="easy" checked> Easy</label>
+                    <label><input type="checkbox" class="filter-checkbox" value="medium" checked> Medium</label>
+                    <label><input type="checkbox" class="filter-checkbox" value="hard" checked> Hard</label>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Sort By</label>
+                <select id="sortBy" class="select-filter">
+                    <option value="newest">Newest First</option>
+                    <option value="popular">Most Popular</option>
+                    <option value="difficulty">Difficulty</option>
+                </select>
+            </div>
+
+            <button class="btn-primary" id="clearFilters">Clear Filters</button>
+        </aside>
+
+        <!-- Problems Section -->
+        <section class="problems-section" id="problemsSection">
+            <div class="section-header">
+                <h2>Problems Library</h2>
+                <button class="btn-secondary" id="toggleView">📊 Quiz Mode</button>
+            </div>
+            
+            <div id="problemsContainer" class="problems-grid">
+                <!-- Problems will be loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Problem Detail Modal -->
+    <div id="problemModal" class="modal modal-large">
+        <div class="modal-content modal-full">
+            <span class="close">&times;</span>
+            <div class="problem-detail">
+                <div class="problem-header">
+                    <h2 id="problemTitle"></h2>
+                    <div class="problem-meta">
+                        <span id="problemSubject" class="badge badge-subject"></span>
+                        <span id="problemDifficulty" class="badge badge-difficulty"></span>
+                    </div>
+                </div>
+
+                <div class="problem-content">
+                    <div class="problem-section">
+                        <h3>Problem</h3>
+                        <div id="problemStatement" class="problem-text"></div>
+                        <img id="problemImage" class="problem-image" style="display: none;">
+                    </div>
+
+                    <div class="problem-section">
+                        <h3>Solution</h3>
+                        <div id="problemSolution" class="problem-text"></div>
+                    </div>
+
+                    <div class="problem-section">
+                        <h3>Step-by-Step Guide</h3>
+                        <div id="stepByStep" class="steps-container"></div>
+                    </div>
+
+                    <div class="problem-actions">
+                        <button class="btn-primary" id="markCompletedBtn">✓ Mark as Complete</button>
+                        <button class="btn-secondary" id="bookmarkBtn">⭐ Bookmark</button>
+                    </div>
+
+                    <div class="problem-section">
+                        <h3>Discussion</h3>
+                        <div id="commentsSection" class="comments-section">
+                            <div class="comment-form">
+                                <textarea id="commentText" placeholder="Add your comment..." rows="3"></textarea>
+                                <button class="btn-primary" id="submitCommentBtn">Post Comment</button>
+                            </div>
+                            <div id="commentsList" class="comments-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>STEM Solver</h4>
+                <p>Master STEM subjects with our comprehensive problem library</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#problems">Problems</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link">Twitter</a>
+                    <a href="#" class="social-link">GitHub</a>
+                    <a href="#" class="social-link">LinkedIn</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 STEM Problem Solver. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
